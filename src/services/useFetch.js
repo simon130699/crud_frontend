@@ -7,6 +7,7 @@ export const useFetch = ( url ) => {
         data: null,
         isLoading: true,
         hasError: null,
+        refetch:null
     })
 
 
@@ -24,6 +25,7 @@ export const useFetch = ( url ) => {
             data,
             isLoading: false,
             hasError: null,
+            refetch: getFetch
         });
     }
 
@@ -38,5 +40,7 @@ export const useFetch = ( url ) => {
         data:      state.data,
         isLoading: state.isLoading,
         hasError:  state.hasError,
+        refetch: getFetch
+        
     };
 }

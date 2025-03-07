@@ -3,31 +3,28 @@ import usePost from "../../services/usePost";
 import { useForm } from "../../services/useForm"; 
 import { TextField, Button, Box, Typography, CircularProgress, Alert } from "@mui/material";
 
-const ProductAdd = () => {
+const ProductAdd = ({handleClose}) => {
   
 
     const { formState, onInputChange, onResetForm } = useForm({
-        codigo_producto: "",
-        cantidad_disponible: "",
-        costo: "",
-        marca: "",
         nombre: "",
-        codigo_venta: "",
-        total_venta: "",
+        codigo_producto: "",
+        costo: "",
+        cantidad_disponible: "",
         descripcion: "",
     });
     const { postData, isLoading, error } = usePost("http://localhost:8080/productos/crear");
-
+  
     const handleSubmit = async (e) => {
+        
         e.preventDefault();
         const response = await postData(formState);
         if (response) {
-            console.log("Producto guardado:", response);
-           
+            console.log("Producto guardado:", response);   
             onResetForm();
-            
-            
+            handleClose();
         }
+
     };
 
     return (
