@@ -12,33 +12,37 @@ export default function ProductFormModal() {
   const handleClickOpen = () => {
     setOpen(true); // Abrir el modal
   };
-
+  
+  /* const asd = () => {
+    try {
+      const post = await post
+      if(post.success) refetch
+      close
+    } catch (error) {
+      console.log(error);
+    }} */
+    
   const handleClose = () => {
     setOpen(false); // Cerrar el modal
   };
 
-  // Si los datos son cargados o hay un error, puedes manejarlos aquí
   useEffect(() => {
-    // Esto puede ser útil si quieres que algo suceda cuando `data` cambie
-    if (data) {
-      console.log("Datos actualizados", data);
-    }
+    refetch();
     if (hasError) {
       console.error("Error al cargar los productos:", hasError);
     }
-  }, [data, hasError]);
+  }, []);
 
   return (
     <div style={{ textAlign: 'center', marginTop: '20px' }}>
-      <Button variant="contained" onClick={handleClickOpen}>
+      <Button variant="contained" onClick={handleClickOpen} hideModal>
         Agregar Producto
       </Button>
-
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} >
         <DialogTitle>Agregar Producto</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 2 }}>
-            <ProductAdd handleClose={handleClose} refetch={refetch} />
+            <ProductAdd refetch={refetch} handleClose={handleClose}  />
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -48,22 +52,7 @@ export default function ProductFormModal() {
         </DialogActions>
       </Dialog>
 
-      {/* Aquí puedes mostrar los productos si están disponibles */}
-      {isLoading ? (
-        <p>Cargando productos...</p>
-      ) : hasError ? (
-        <p>Error al cargar los productos</p>
-      ) : (
-        <div>
-          <h2>Productos:</h2>
-          {data?.map(product => (
-            <div key={product.codigo_producto}>
-              <h3>{product.nombre}</h3>
-              <p>{product.descripcion}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      
     </div>
   );
 }

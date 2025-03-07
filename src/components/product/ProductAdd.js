@@ -3,7 +3,7 @@ import usePost from "../../services/usePost";
 import { useForm } from "../../services/useForm"; 
 import { TextField, Button, Box, Typography, CircularProgress, Alert } from "@mui/material";
 
-const ProductAdd = ({handleClose}) => {
+const ProductAdd = ({handleClose,refetch}) => {
   
 
     const { formState, onInputChange, onResetForm } = useForm({
@@ -14,14 +14,15 @@ const ProductAdd = ({handleClose}) => {
         descripcion: "",
     });
     const { postData, isLoading, error } = usePost("http://localhost:8080/productos/crear");
-  
     const handleSubmit = async (e) => {
+        console.log(refetch)
         
         e.preventDefault();
         const response = await postData(formState);
         if (response) {
             console.log("Producto guardado:", response);   
             onResetForm();
+            await refetch();
             handleClose();
         }
 
