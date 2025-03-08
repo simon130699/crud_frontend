@@ -21,8 +21,6 @@ export const useFetch = ( url ) => {
         const resp = await fetch(url);
         const data = await resp.json();
 
-/*             return data
- */
         setState({
             data,
             isLoading: false,

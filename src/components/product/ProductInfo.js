@@ -9,19 +9,37 @@ import {
     Grid,
     IconButton,
 } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material"; // Iconos para eliminar y editar
+import { Delete, Edit } from "@mui/icons-material";
 
-export const ProductInfo = ({data,isLoading,error}) => {
-    JSON.stringify(data);    
+export const ProductInfo = ({ data, isLoading, error,refetch }) => {
+
     // Funciones para eliminar y editar
-    const handleDelete = (id) => {
-        console.log("Eliminar producto con ID:", id);
-        // Aquí puedes agregar la lógica para eliminar el producto
+    const handleDelete = async (id) => {
+    await refetch();
+   /*  const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este producto?");
+    if (!confirmDelete) return; */
+
+    try {
+        const response = await fetch(`http://localhost:8080/productos/eliminar/${id}`, {
+            method: "DELETE",
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al eliminar el producto");
+        }
+
+      
+
+    } catch (error) {
+        console.error("Error eliminando el producto:", error);
+        alert("Hubo un problema al eliminar el producto");
+    }
+    await refetch();
     };
+
 
     const handleEdit = (id) => {
         console.log("Editar producto con ID:", id);
-        // Aquí puedes agregar la lógica para editar el producto
     };
 
     if (isLoading) {
@@ -47,90 +65,48 @@ export const ProductInfo = ({data,isLoading,error}) => {
             </Typography>
             <Card>
                 <CardContent>
-                    <Grid container spacing={1}>
-                        {/* Columna para Nombre */}
-                        <Grid item xs={2}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                                Nombre
-                            </Typography>
-                            {data && data.map((producto, index) => (
-                                <Typography key={index} variant="body1">
+                    {/* Encabezados */}
+                    <Grid container spacing={2} sx={{ fontWeight: "bold", borderBottom: "2px solid #ddd", paddingBottom: 1 }}>
+                        <Grid item xs={2}>Nombre</Grid>
+                        <Grid item xs={2}>Código</Grid>
+                        <Grid item xs={2}>Costo</Grid>
+                        <Grid item xs={2}>Cantidad</Grid>
+                        <Grid item xs={2}>Descripción</Grid>
+                        <Grid item xs={2}>Acciones</Grid>
+                    </Grid>
+
+                    {/* Datos de productos */}
+                    {data && data.map((producto, index) => (
+                        <Grid container key={index} spacing={2} sx={{ paddingY: 1, borderBottom: "1px solid #eee", alignItems: "center" }}>
+                            <Grid item xs={2}>
+                                <Typography variant="body1" sx={{ wordBreak: "break-word" }}>
                                     {producto.nombre}
                                 </Typography>
-                            ))}
-                        </Grid>
-
-                        {/* Columna para Código */}
-                        <Grid item xs={2}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                                Código
-                            </Typography>
-                            {data && data.map((producto, index) => (
-                                <Typography key={index} variant="body1">
-                                    {producto.codigo_producto}
-                                </Typography>
-                            ))}
-                        </Grid>
-
-                        {/* Columna para Costo */}
-                        <Grid item xs={2}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                                Costo
-                            </Typography>
-                            {data && data.map((producto, index) => (
-                                <Typography key={index} variant="body1">
-                                    ${producto.costo}
-                                </Typography>
-                            ))}
-                        </Grid>
-
-                        {/* Columna para Cantidad */}
-                        <Grid item xs={2}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                                Cantidad
-                            </Typography>
-                            {data && data.map((producto, index) => (
-                                <Typography key={index} variant="body1">
-                                    {producto.cantidad_disponible}
-                                </Typography>
-                            ))}
-                        </Grid>
-
-                        {/* Columna para Descripción */}
-                        <Grid item xs={2}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                                Descripción
-                            </Typography>
-                            {data && data.map((producto, index) => (
-                                <Typography key={index} variant="body1">
+                            </Grid>
+                            <Grid item xs={2}>
+                                <Typography variant="body1">{producto.codigo_producto}</Typography>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <Typography variant="body1">${producto.costo}</Typography>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <Typography variant="body1">{producto.cantidad_disponible}</Typography>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <Typography variant="body1" sx={{ wordBreak: "break-word" }}>
                                     {producto.descripcion}
                                 </Typography>
-                            ))}
+                            </Grid>
+                            <Grid item xs={2} sx={{ display: 'flex', gap: 1 }}>
+                                <IconButton color="primary" onClick={() => handleEdit(producto.codigo_producto)}>
+                                    <Edit />
+                                </IconButton>
+                                <IconButton color="error" onClick={() => handleDelete(producto.codigo_producto)}>
+                                    <Delete />
+                                </IconButton>
+                            </Grid>
                         </Grid>
-
-                        {/* Columna para Acciones */}
-                        <Grid item xs={2}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                                Acciones
-                            </Typography>
-                            {data && data.map((producto, index) => (
-                                <Box key={index} sx={{ display: 'flex', gap: 1 }}>
-                                    <IconButton
-                                        color="primary"
-                                        onClick={() => handleEdit(producto.codigo_producto)} 
-                                    >
-                                        <Edit />
-                                    </IconButton>
-                                    <IconButton
-                                        color="error"
-                                        onClick={() => handleDelete(producto.codigo_producto)} 
-                                    >
-                                        <Delete />
-                                    </IconButton>
-                                </Box>
-                            ))}
-                        </Grid>
-                    </Grid>
+                    ))}
                 </CardContent>
             </Card>
         </Box>
