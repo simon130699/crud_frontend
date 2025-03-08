@@ -44,7 +44,7 @@ export default function ProductFormModal() {
         </DialogActions>
       </Dialog>
     </div>
-    <ProductInfo data={data} isLoading={isLoading} error={hasError}/>
+    <ProductInfo refetch={refetch} data={data} isLoading={isLoading} error={hasError}/>
   </>
     
   );
