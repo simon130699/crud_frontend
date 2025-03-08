@@ -10,11 +10,9 @@ import {
     IconButton,
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material"; // Iconos para eliminar y editar
-import { useFetch } from '../../services/useFetch';
 
-export const ProductInfo = () => {
-    const { data, isLoading, error } = useFetch("http://localhost:8080/productos");
-
+export const ProductInfo = ({data,isLoading,error}) => {
+    JSON.stringify(data);    
     // Funciones para eliminar y editar
     const handleDelete = (id) => {
         console.log("Eliminar producto con ID:", id);
