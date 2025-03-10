@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Typography,
@@ -8,38 +8,94 @@ import {
     Alert,
     Grid,
     IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Button
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
+import { useForm } from '../../services/useForm';
 
-export const ProductInfo = ({ data, isLoading, error,refetch }) => {
+export const ProductInfo = ({ data, isLoading, error, refetch }) => {
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    
+    const initialForm = {
+        nombre: '',
+        codigo_producto: '',
+        costo: '',
+        cantidad_disponible: '',
+        descripcion: ''
+    };
+    
+    const { formState, onInputChange, onResetForm } = useForm(initialForm);
 
     // Funciones para eliminar y editar
     const handleDelete = async (id) => {
-    await refetch();
-   /*  const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este producto?");
-    if (!confirmDelete) return; */
+        try {
+            const response = await fetch(`http://localhost:8080/productos/eliminar/${id}`, {
+                method: "DELETE",
+            });
 
-    try {
-        const response = await fetch(`http://localhost:8080/productos/eliminar/${id}`, {
-            method: "DELETE",
-        });
+            if (!response.ok) {
+                throw new Error("Error al eliminar el producto");
+            }
 
-        if (!response.ok) {
-            throw new Error("Error al eliminar el producto");
+            await refetch();
+
+        } catch (error) {
+            console.error("Error eliminando el producto:", error);
+            alert("Hubo un problema al eliminar el producto");
         }
-
-      
-
-    } catch (error) {
-        console.error("Error eliminando el producto:", error);
-        alert("Hubo un problema al eliminar el producto");
-    }
-    await refetch();
     };
 
-
+    // Función para abrir el diálogo de edición
     const handleEdit = (id) => {
-        console.log("Editar producto con ID:", id);
+        const productToEdit = data.find(product => product.codigo_producto === id);
+        
+            const productData = {
+                nombre: productToEdit.nombre,
+                codigo_producto: productToEdit.codigo_producto,
+                costo: productToEdit.costo,
+                cantidad_disponible: productToEdit.cantidad_disponible,
+                descripcion: productToEdit.descripcion
+            };
+            
+            // Reiniciamos el formulario con los datos del producto
+            onResetForm(productData);
+            
+            setOpenEditDialog(true);
+        
+    };
+
+    // Función para enviar los datos actualizados
+    const handleSubmitEdit = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/productos/editar/${formState.codigo_producto}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formState)
+            });
+            if (!response.ok) {
+                throw new Error("Error al actualizar el producto");
+            }
+
+            setOpenEditDialog(false);
+            onResetForm(initialForm);
+            await refetch();
+
+        } catch (error) {
+            console.error("Error actualizando el producto:", error);
+            alert("Hubo un problema al actualizar el producto");
+        }
+    };
+
+    const handleCloseDialog = () => {
+        setOpenEditDialog(false);
+        onResetForm(initialForm);
     };
 
     if (isLoading) {
@@ -109,6 +165,72 @@ export const ProductInfo = ({ data, isLoading, error,refetch }) => {
                     ))}
                 </CardContent>
             </Card>
+
+            {/* Diálogo de edición */}
+            <Dialog open={openEditDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+                <DialogTitle>Editar Producto</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        margin="dense"
+                        label="Nombre"
+                        type="text"
+                        fullWidth
+                        name="nombre"
+                        value={formState.nombre}
+                        onChange={onInputChange}
+                        sx={{ mb: 2, mt: 1 }}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Código"
+                        type="text"
+                        fullWidth
+                        name="codigo_producto"
+                        value={formState.codigo_producto}
+                        disabled 
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Costo"
+                        type="number"
+                        fullWidth
+                        name="costo"
+                        value={formState.costo}
+                        onChange={onInputChange}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Cantidad Disponible"
+                        type="number"
+                        fullWidth
+                        name="cantidad_disponible"
+                        value={formState.cantidad_disponible}
+                        onChange={onInputChange}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Descripción"
+                        type="text"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        name="descripcion"
+                        value={formState.descripcion}
+                        onChange={onInputChange}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="secondary">
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleSubmitEdit} color="primary">
+                        Guardar Cambios
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
